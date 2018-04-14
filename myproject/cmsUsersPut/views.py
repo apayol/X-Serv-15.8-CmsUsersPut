@@ -5,13 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
-FORMULARIO_NAME = """
-    <form action="" method="POST">
-        Nombre:
-        <input type="text" name="name" value="">
-        <input type="submit" value="Enviar">
-    </form>
-"""
+
 FORMULARIO_PAGE = """
     <form action="" method="POST">
         Contenido:
@@ -19,6 +13,7 @@ FORMULARIO_PAGE = """
         <input type="submit" value="Enviar">
     </form>
 """
+
 
 def logg(request):
     if request.user.is_authenticated():
@@ -51,7 +46,13 @@ def pagina(request, name):
     if request.method == "GET":
         try:
             pagina = Pages.objects.get(name=name)
-            respuesta = pagina.page
+            respuesta = pagina.page + "<br><br>"
+            if request.user.is_authenticated():
+                respuesta += "¿Editar esta página?"
+                respuesta += FORMULARIO_PAGE
+            else:
+                respuesta += "Haz log in para editar."
+
         except Pages.DoesNotExist:
             logged = logg(request)
             if request.user.is_authenticated():
@@ -63,10 +64,17 @@ def pagina(request, name):
             return HttpResponseNotFound(logged + respuesta)
 
     elif request.method == "POST":
-        page = request.POST["page"]
-        nueva = Pages(name=name, page=page)
-        nueva.save()
+        try: #  editar contenido
+            busco = Pages.objects.get(name=name)
+            page = request.POST["page"]
+            nueva = Pages(id=busco.id,name=name, page=page)
+            nueva.save(force_update=True)
+        except Pages.DoesNotExist: #  crear nueva entrada
+            page = request.POST["page"]
+            nueva = Pages(name=name, page=page)
+            nueva.save()
         respuesta = "Página actualizada con éxito"
+    
     else:
         respuesta = "Método no permitido"
     return HttpResponse(logged + respuesta)
