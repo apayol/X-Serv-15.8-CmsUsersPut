@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from cmsUsersPut import views
+from django.contrib.auth.views import logout
+from django.contrib.auth.views import login
 
 urlpatterns = patterns('',
     # Examples:
@@ -9,5 +11,8 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.inicio, name="Página inicio"),
+    url(r'^logout', logout),
+    url(r'^login', login),
+    url(r'^accounts/profile/', views.login_exito, name="Login hecho"),
     url(r'(.+)', views.pagina, name="Página"),
 )

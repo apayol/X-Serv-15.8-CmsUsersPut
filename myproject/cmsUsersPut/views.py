@@ -6,15 +6,23 @@ from django.http import HttpResponse, HttpResponseNotFound
 
 def inicio(request):
     if request.method == "GET":
-        respuesta = "<h3>Bienvenido a cmsUsersPut</h3><br>"
-        respuesta += "La lista de páginas guardadas es:<br>"
+        titulo = "<h3>Bienvenido a cmsUsersPut</h3>"
+        respuesta = "<br>La lista de páginas guardadas es:<br>"
         paginas = Pages.objects.all()
         for pagina in paginas:
             respuesta += "<ul><li>" + pagina.name + " => "
             respuesta += pagina.page + "</ul></li>"
+
+        #  Logged:
+        if request.user.is_authenticated():
+            logged = "> Logged in as " + request.user.username
+            logged += ". <a href='/logout'> Logout </a><br>"
+        else:
+            logged = "> Not logged in. "
+            logged += "<a href='/login'> Login </a><br>"
     else:
         respuesta = "Método no permitido"
-    return HttpResponse(respuesta)
+    return HttpResponse(titulo + logged + respuesta)
 
 
 def pagina(request, name):
@@ -26,4 +34,9 @@ def pagina(request, name):
             return HttpResponseNotFound("La página no existe")
     else:
         respuesta = "Método no permitido"
+    return HttpResponse(respuesta)
+
+def login_exito (request):
+    respuesta = "Logged in as " + request.user.username
+    respuesta += " successfully"
     return HttpResponse(respuesta)
