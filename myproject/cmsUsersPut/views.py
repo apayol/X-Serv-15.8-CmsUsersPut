@@ -14,7 +14,6 @@ FORMULARIO_PAGE = """
     </form>
 """
 
-
 def logg(request):
     if request.user.is_authenticated():
         logged = "> Logged in as " + request.user.username
@@ -67,8 +66,8 @@ def pagina(request, name):
         try: #  editar contenido
             busco = Pages.objects.get(name=name)
             page = request.POST["page"]
-            nueva = Pages(id=busco.id,name=name, page=page)
-            nueva.save(force_update=True)
+            nueva = Pages(id=busco.id, name=name, page=page)
+            nueva.save(force_update=True) #  sobreescribir
         except Pages.DoesNotExist: #  crear nueva entrada
             page = request.POST["page"]
             nueva = Pages(name=name, page=page)
